@@ -157,6 +157,11 @@ window.UI = (function () {
     arts.forEach(a => { (cats[a.cat] = cats[a.cat] || []).push(a); });
     el("app").innerHTML = `
       <header class="top"><div><h2>3分で学ぶ</h2><div class="muted sm">予防医学コラム ${arts.length}本</div></div></header>
+      <button class="gut-card" id="gutGuide">
+        <div class="gut-card-l"><i class="ti ti-bug"></i></div>
+        <div class="gut-card-r"><div class="gut-card-t">腸を育てる完全ガイド</div><div class="gut-card-s">腸内細菌の重要性と、最高の環境に育てる方法</div></div>
+        <i class="ti ti-chevron-right"></i>
+      </button>
       <button class="learn-card today" id="todayArt">
         <div class="learn-tag"><i class="ti ti-star"></i> 今日の1本 · ${today.min}分</div>
         <div class="learn-title">${esc(today.title)}</div>
@@ -172,7 +177,38 @@ window.UI = (function () {
         </div>`).join("")}
     `;
     el("todayArt").onclick = () => handlers.openArticle(today.id);
+    el("gutGuide").onclick = () => handlers.openGut();
     el("app").querySelectorAll("[data-art]").forEach(b => b.onclick = () => handlers.openArticle(b.dataset.art));
+  }
+
+  // ---- 腸活ガイド ----
+  function gutGuide(handlers) {
+    const g = window.YOBOU_GUT;
+    el("app").innerHTML = `
+      <button class="back" id="back"><i class="ti ti-arrow-left"></i> 学び</button>
+      <header class="top"><div><h2>腸を育てる完全ガイド</h2><div class="muted sm">腸内細菌を最高の環境に</div></div></header>
+      <p class="cond-ov">${esc(g.intro)}</p>
+      ${g.sections.map(s => `
+        <div class="careblk">
+          <div class="careblk-h"><i class="ti ${s.icon}"></i> ${esc(s.title)}</div>
+          <ul>${s.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+        </div>`).join("")}
+
+      <h3 class="sec">サプリ・ハーブ（任意・主治医と）</h3>
+      <div class="supp-note"><i class="ti ti-flask"></i> 土台は“食事(発酵食品＋食物繊維)”。下記は一次情報(RCT/コホート)で確認した補助。薬がある人や免疫が弱い人は主治医に相談を。</div>
+      <div class="cards">
+        ${g.supplements.map(s => `
+          <article class="card">
+            <div class="card-head"><span class="chip"><i class="ti ti-flask"></i>${esc(s.name)}</span><span class="ev">${stars(s.evidence)}</span></div>
+            <p class="supp-dose"><i class="ti ti-prescription"></i> ${esc(s.dose)}</p>
+            <p>${esc(s.effect)}</p>
+            <p class="supp-caution"><i class="ti ti-alert-triangle"></i> ${esc(s.caution)}</p>
+            <div class="src">出典: ${esc(s.source)}</div>
+          </article>`).join("")}
+      </div>
+      <p class="muted sm note">※ 持病・服薬・妊娠中・免疫低下のある人は、サプリ開始前に主治医に相談してください。</p>
+    `;
+    el("back").onclick = () => handlers.nav("learn");
   }
 
   function articleDetail(id, handlers) {
@@ -376,6 +412,7 @@ window.UI = (function () {
     const items = [["home", "ホーム", "ti-home"], ["plan", "プラン", "ti-calendar"], ["meals", "献立", "ti-salad"], ["learn", "学び", "ti-bulb"], ["care", "ケア", "ti-stethoscope"], ["log", "記録", "ti-pencil"]];
     if (["history", "settings"].includes(active)) active = active === "history" ? "log" : "home";
     if (active === "condition") active = "care";
+    if (active === "gut") active = "learn";
     el("nav").innerHTML = items.map(([k, t, ic]) =>
       `<button class="${active === k ? "on" : ""}" data-nav="${k}"><i class="ti ${ic}"></i><span>${t}</span></button>`).join("");
     el("nav").querySelectorAll("[data-nav]").forEach(b => b.onclick = () => handlers.nav(b.dataset.nav));
@@ -383,5 +420,5 @@ window.UI = (function () {
   }
   function hideNav() { el("nav").style.display = "none"; }
 
-  return { onboarding, home, plan, meals, learn, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
+  return { onboarding, home, plan, meals, learn, gutGuide, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
 })();
