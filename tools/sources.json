@@ -1,0 +1,13 @@
+{
+  "_note": "自動更新で参照するソース。podcastはAppleIDからRSSを解決、youtubeはchannelIdのフィードを見る。",
+  "podcasts": [
+    { "name": "BoundlessLife",  "appleId": "283908977"  },
+    { "name": "Huberman",       "appleId": "1545953110" },
+    { "name": "HumanUpgrade",   "appleId": "451295014"  }
+  ],
+  "youtube": [
+    { "name": "Kageyama",     "channelId": "UCjcrRfbHokl8VVh2KVA2mDQ" },
+    { "name": "AfrodeClinic", "channelId": "UCEmmSXrqd5hrhEqlDIm7Rmw" }
+  ],
+  "podcastLookback": 6
+}
