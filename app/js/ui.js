@@ -249,6 +249,20 @@ window.UI = (function () {
       ${careBlock("ti-run", "運動", c.weekly.exercise)}
       ${careBlock("ti-sun", "生活習慣", c.weekly.lifestyle)}
 
+      ${c.supplements && c.supplements.length ? `
+      <h3 class="sec">サプリ・ハーブ（任意・主治医と）</h3>
+      <div class="supp-note"><i class="ti ti-flask"></i> Podcast等で話題のものを一次情報(RCT/メタ解析)で確認したもの。処方薬の代わりにせず、薬を飲んでいる人は必ず主治医に相談してください。</div>
+      <div class="cards">
+        ${c.supplements.map(sid => { const s = window.YOBOU_SUPPLEMENTS[sid]; return s ? `
+          <article class="card">
+            <div class="card-head"><span class="chip"><i class="ti ti-flask"></i>${esc(s.name)}</span><span class="ev">${stars(s.evidence)}</span></div>
+            <p class="supp-dose"><i class="ti ti-prescription"></i> ${esc(s.dose)}</p>
+            <p>${esc(s.effect)}</p>
+            <p class="supp-caution"><i class="ti ti-alert-triangle"></i> ${esc(s.caution)}</p>
+            <div class="src">一次情報: ${esc(s.source)}</div>
+          </article>` : ""; }).join("")}
+      </div>` : ""}
+
       <h3 class="sec">食材の目安</h3>
       <div class="foods">
         <div class="foods-col good"><div class="foods-h"><i class="ti ti-circle-check"></i> 増やす</div>${c.foods.good.map(f => `<span>${esc(f)}</span>`).join("")}</div>

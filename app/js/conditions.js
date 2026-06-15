@@ -36,7 +36,8 @@ window.YOBOU_CONDITIONS = {
       { id: "veg", label: "野菜350g/果物を食べた" },
       { id: "move", label: "30分以上動いた" },
       { id: "alcohol", label: "お酒を控えた(20g以下/休肝)" }
-    ]
+    ],
+    supplements: ["garlic", "nitrate", "magnesium"]
   },
 
   diabetes: {
@@ -72,7 +73,8 @@ window.YOBOU_CONDITIONS = {
       { id: "walk", label: "食後に歩いた" },
       { id: "sugar", label: "甘い飲料を避けた" },
       { id: "move", label: "運動した" }
-    ]
+    ],
+    supplements: ["berberine", "magnesium"]
   },
 
   cholesterol: {
@@ -106,7 +108,8 @@ window.YOBOU_CONDITIONS = {
       { id: "fiber", label: "水溶性食物繊維を摂った" },
       { id: "goodfat", label: "良い油(青魚/オリーブ/ナッツ)" },
       { id: "move", label: "運動した" }
-    ]
+    ],
+    supplements: ["omega3", "garlic", "berberine"]
   },
 
   atherosclerosis: {
@@ -142,7 +145,8 @@ window.YOBOU_CONDITIONS = {
       { id: "nosmoke", label: "タバコを吸わなかった" },
       { id: "move", label: "運動した" },
       { id: "salt", label: "減塩・加工食品を控えた" }
-    ]
+    ],
+    supplements: ["omega3", "garlic", "nitrate"]
   },
 
   heartfailure: {
@@ -178,7 +182,8 @@ window.YOBOU_CONDITIONS = {
       { id: "weight", label: "毎日体重を測った" },
       { id: "fluid", label: "水分を指示通りに守った" },
       { id: "noalcohol", label: "お酒を控えた" }
-    ]
+    ],
+    supplements: ["coq10", "omega3"]
   },
 
   ckd: {
@@ -286,6 +291,47 @@ window.YOBOU_CONDITIONS = {
       { id: "sleep", label: "睡眠を一定にできた" },
       { id: "trigger", label: "誘因(酒/特定食品)を避けた" }
     ]
+  }
+};
+
+// サプリ・ハーブ（心臓血管系）。Podcast/YouTube由来の候補を一次情報(RCT/メタ解析)で裏取り済み。
+// ⚠️ いずれも任意の"補助"。処方薬の代わりにせず、必ず主治医に相談（特に薬を飲んでいる人）。
+window.YOBOU_SUPPLEMENTS = {
+  coq10: {
+    name: "コエンザイムQ10 (CoQ10)", dose: "100mg×3回/日(ユビキノール)", evidence: 3,
+    effect: "中等症〜重症の心不全で、標準治療への追加により総死亡・心血管死・入院を低下（RCT n=420: 総死亡10% vs 18%）。",
+    caution: "標準治療の代わりにしない。ワルファリンの効きを弱めることがある。開始前に主治医へ。",
+    source: "Q-SYMBIO 2014 (PubMed 25282031)"
+  },
+  omega3: {
+    name: "オメガ3 (EPA/DHA・青魚)", dose: "基本は青魚 週2-3回。高中性脂肪は医療用EPAを医師の処方で", evidence: 3,
+    effect: "中性脂肪を低下。スタチン＋高TGの人で高用量の医療用EPA 4g/日が心血管イベントを低下（REDUCE-IT n=8179: 17.2% vs 22%）。",
+    caution: "※市販の魚油サプリで一般的な心血管予防効果は限定的。効果は高用量の医療用EPAで示された点に注意。出血リスク↑（抗凝固薬・手術前）。",
+    source: "REDUCE-IT 2019 (PubMed 30415628)"
+  },
+  magnesium: {
+    name: "マグネシウム", dose: "300〜368mg/日", evidence: 2,
+    effect: "血圧を軽度低下（34RCTメタ解析: 収縮期-2.0 / 拡張期-1.8mmHg）。",
+    caution: "腎臓病(CKD)では蓄積し危険→使用前に必ず医師へ。多いと下痢。",
+    source: "メタ解析 2016 (PubMed 27402922)"
+  },
+  garlic: {
+    name: "ニンニク（熟成ニンニク抽出物）", dose: "熟成ニンニク抽出物 約600〜1200mg/日", evidence: 2,
+    effect: "血圧低下（メタ解析: 収縮期-5、高血圧者では-8.7mmHg）＋総/LDLコレステロール約10%低下。",
+    caution: "出血リスク↑（抗凝固薬・手術前は注意）。",
+    source: "Ried メタ解析 2016 (PubMed 26764326)"
+  },
+  nitrate: {
+    name: "硝酸塩（ビーツ／葉物野菜）", dose: "ビーツジュースや硝酸の多い野菜(ほうれん草・ルッコラ等)。食品からが基本", evidence: 2,
+    effect: "収縮期血圧を低下（メタ解析: -4.4mmHg）。",
+    caution: "降圧薬との併用で下がりすぎに注意。シュウ酸が多く、結石リスクのある人は控えめに。",
+    source: "メタ解析 2013 (PubMed 23596162)"
+  },
+  berberine: {
+    name: "ベルベリン", dose: "500mg×2〜3回/日（研究での一般的用量）", evidence: 2,
+    effect: "LDL・中性脂肪・血糖を改善（27RCTメタ解析・重篤な副作用報告なし）。",
+    caution: "薬物相互作用が多い（CYP阻害でスタチン等の血中濃度↑）。糖尿病薬と併用で低血糖。妊娠・授乳中は避ける。必ず主治医へ。",
+    source: "メタ解析 2015 (PubMed 25498346)"
   }
 };
 
