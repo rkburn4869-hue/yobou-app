@@ -20,7 +20,13 @@
 
   const handlers = {
     nav: go,
-    openArticle: id => { const profile = Store.getProfile(); UI.nav("learn", handlers); UI.articleDetail(id, handlers); window.scrollTo(0, 0); },
+    openArticle: id => { UI.nav("learn", handlers); UI.articleDetail(id, handlers); window.scrollTo(0, 0); },
+    openCondition: id => { UI.nav("condition", handlers); UI.conditionDetail(id, handlers); window.scrollTo(0, 0); },
+    toggleCondition: id => { Store.toggleCondition(id); go("care"); },
+    toggleCare: (condId, date, habitId) => {
+      Store.toggleCareHabit(condId, date, habitId);
+      UI.nav("condition", handlers); UI.conditionDetail(condId, handlers);
+    },
     toggle: domain => {
       const date = window.YDate.today();
       const log = Store.getLog(date) || { date, done: [] };
@@ -56,6 +62,7 @@
     else if (route === "plan") UI.plan(profile, plan);
     else if (route === "meals") UI.meals(profile, handlers);
     else if (route === "learn") UI.learn(handlers);
+    else if (route === "care") UI.care(handlers);
     else if (route === "log") UI.logForm(date, Store.getLog(date), handlers);
     else if (route === "history") UI.history(Store.getLogs());
     else if (route === "settings") UI.settings(profile, handlers);

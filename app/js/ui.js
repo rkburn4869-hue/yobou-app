@@ -188,6 +188,82 @@ window.UI = (function () {
     el("back").onclick = () => handlers.nav("learn");
   }
 
+  // ---- 疾患ケア 一覧 ----
+  function care(handlers) {
+    const conds = window.YOBOU_CONDITIONS;
+    const selected = window.Store.getConditions();
+    el("app").innerHTML = `
+      <header class="top"><div><h2>疾患ケア</h2><div class="muted sm">ガイドライン準拠の週間ケア</div></div></header>
+      <div class="disc"><i class="ti ti-alert-triangle"></i> 一般的な生活習慣の情報で、医療アドバイス・診断ではありません。服薬・食事制限の指示がある人はそれを優先し、必ず主治医に相談してください。</div>
+      <h3 class="sec">対象の疾患を選ぶ</h3>
+      <div class="cond-chips">
+        ${Object.keys(conds).map(id => `<button class="cond-chip ${selected.includes(id) ? "on" : ""}" data-cond="${id}"><i class="ti ${conds[id].icon}"></i>${conds[id].name}</button>`).join("")}
+      </div>
+      ${selected.length ? `<h3 class="sec">あなたのケア</h3>
+        <div class="cards">${selected.map(id => {
+          const fb = window.conditionFeedback(id);
+          return `<button class="cond-card" data-open="${id}">
+            <div class="cond-card-h"><i class="ti ${conds[id].icon}"></i><span>${conds[id].name}</span><i class="ti ti-chevron-right"></i></div>
+            <div class="cond-card-sub">${conds[id].guideline} · 今週の実践 ${fb.rate}%</div>
+          </button>`; }).join("")}</div>`
+        : `<p class="empty">上から疾患を選ぶと、週間のケアプランが表示されます。</p>`}
+    `;
+    el("app").querySelectorAll("[data-cond]").forEach(b => b.onclick = () => handlers.toggleCondition(b.dataset.cond));
+    el("app").querySelectorAll("[data-open]").forEach(b => b.onclick = () => handlers.openCondition(b.dataset.open));
+  }
+
+  // ---- 疾患ケア 詳細 ----
+  function conditionDetail(condId, handlers) {
+    const c = window.YOBOU_CONDITIONS[condId];
+    const dates = window.weekDates();
+    const careData = window.Store.getCare(condId);
+    const today = window.YDate.today();
+    const wd = ["月", "火", "水", "木", "金", "土", "日"];
+    const fb = window.conditionFeedback(condId);
+    const grid = c.habits.map(h => `
+      <div class="chk-row">
+        <div class="chk-label">${esc(h.label)}</div>
+        <div class="chk-cells">
+          ${dates.map((dt, i) => {
+            const on = (careData[dt] || []).includes(h.id);
+            const isToday = dt === today;
+            return `<button class="chk ${on ? "on" : ""} ${isToday ? "today" : ""}" data-h="${h.id}" data-dt="${dt}" aria-label="${wd[i]}">${on ? '<i class="ti ti-check"></i>' : wd[i]}</button>`;
+          }).join("")}
+        </div>
+      </div>`).join("");
+    el("app").innerHTML = `
+      <button class="back" id="back"><i class="ti ti-arrow-left"></i> 疾患ケア</button>
+      <header class="top"><div><h2>${esc(c.name)}</h2><div class="muted sm">${esc(c.guideline)}</div></div></header>
+      <p class="cond-ov">${esc(c.overview)}</p>
+      <div class="redflag"><div class="redflag-h"><i class="ti ti-alert-triangle"></i> 受診の目安・注意</div>
+        <ul>${c.redFlags.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>
+
+      <h3 class="sec">今週のセルフチェック</h3>
+      <div class="chk-grid">${grid}</div>
+      <div class="fb"><div class="fb-h"><i class="ti ti-bulb"></i> 今週のフィードバック</div>
+        <p class="fb-head">${esc(fb.head)}</p>
+        <ul>${fb.lines.map(l => `<li>${esc(l)}</li>`).join("")}</ul></div>
+
+      <h3 class="sec">1週間のケア</h3>
+      ${careBlock("ti-salad", "食事", c.weekly.diet)}
+      ${careBlock("ti-run", "運動", c.weekly.exercise)}
+      ${careBlock("ti-sun", "生活習慣", c.weekly.lifestyle)}
+
+      <h3 class="sec">食材の目安</h3>
+      <div class="foods">
+        <div class="foods-col good"><div class="foods-h"><i class="ti ti-circle-check"></i> 増やす</div>${c.foods.good.map(f => `<span>${esc(f)}</span>`).join("")}</div>
+        <div class="foods-col avoid"><div class="foods-h"><i class="ti ti-circle-minus"></i> 控える</div>${c.foods.avoid.map(f => `<span>${esc(f)}</span>`).join("")}</div>
+      </div>
+      <p class="muted sm note">※ カリウム・タンパク質・塩分・水分などに医師の制限がある場合は、その指示が最優先です。</p>
+    `;
+    el("back").onclick = () => handlers.nav("care");
+    el("app").querySelectorAll(".chk").forEach(b => b.onclick = () => handlers.toggleCare(condId, b.dataset.dt, b.dataset.h));
+  }
+  function careBlock(icon, label, items) {
+    return `<div class="careblk"><div class="careblk-h"><i class="ti ${icon}"></i> ${label}</div>
+      <ul>${items.map(i => `<li>${i.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]))}</li>`).join("")}</ul></div>`;
+  }
+
   // ---- 記録 ----
   function logForm(date, log, handlers) {
     log = log || {};
@@ -283,8 +359,9 @@ window.UI = (function () {
   }
 
   function nav(active, handlers) {
-    const items = [["home", "ホーム", "ti-home"], ["plan", "プラン", "ti-calendar"], ["meals", "献立", "ti-salad"], ["learn", "学び", "ti-bulb"], ["log", "記録", "ti-pencil"]];
+    const items = [["home", "ホーム", "ti-home"], ["plan", "プラン", "ti-calendar"], ["meals", "献立", "ti-salad"], ["learn", "学び", "ti-bulb"], ["care", "ケア", "ti-stethoscope"], ["log", "記録", "ti-pencil"]];
     if (["history", "settings"].includes(active)) active = active === "history" ? "log" : "home";
+    if (active === "condition") active = "care";
     el("nav").innerHTML = items.map(([k, t, ic]) =>
       `<button class="${active === k ? "on" : ""}" data-nav="${k}"><i class="ti ${ic}"></i><span>${t}</span></button>`).join("");
     el("nav").querySelectorAll("[data-nav]").forEach(b => b.onclick = () => handlers.nav(b.dataset.nav));
@@ -292,5 +369,5 @@ window.UI = (function () {
   }
   function hideNav() { el("nav").style.display = "none"; }
 
-  return { onboarding, home, plan, meals, learn, articleDetail, logForm, history, settings, nav, hideNav };
+  return { onboarding, home, plan, meals, learn, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
 })();

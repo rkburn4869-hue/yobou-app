@@ -138,6 +138,47 @@ canvas{width:100%;background:var(--surface);border:1px solid var(--line);border-
 .art-body p{font-size:15px;line-height:1.85;margin-bottom:14px}
 .art-done{display:flex;align-items:center;gap:7px;color:var(--accent);font-size:13px;margin-top:8px;padding-top:14px;border-top:1px solid var(--line)}
 
+/* 疾患ケア */
+.disc{background:var(--surface);border:1px solid var(--line);border-left:3px solid #BA7517;border-radius:10px;padding:11px 13px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.disc i{color:#BA7517}
+.cond-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.cond-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:9px 13px;border:1px solid var(--line2);background:var(--surface);border-radius:20px;color:var(--ink);cursor:pointer}
+.cond-chip.on{background:var(--accent-bg);color:var(--accent-ink);border-color:var(--accent)}
+.cond-card{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px;cursor:pointer}
+.cond-card-h{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600}
+.cond-card-h i:last-child{margin-left:auto;color:var(--hint)}
+.cond-card-sub{font-size:12px;color:var(--muted);margin-top:3px;padding-left:27px}
+.cond-ov{font-size:14px;color:var(--ink);margin:4px 0 12px;line-height:1.7}
+.redflag{background:#fbeeea;border:1px solid #f0997b;border-radius:10px;padding:11px 13px;margin-bottom:8px}
+@media (prefers-color-scheme:dark){.redflag{background:#3a1e14;border-color:#993c1d}}
+.redflag-h{font-size:13px;font-weight:600;color:#993c1d;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+@media (prefers-color-scheme:dark){.redflag-h{color:#f0997b}}
+.redflag ul{margin:0;padding-left:18px}
+.redflag li{font-size:12.5px;color:var(--ink);margin-bottom:4px}
+.chk-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.chk-row{}
+.chk-label{font-size:13px;margin-bottom:5px}
+.chk-cells{display:flex;gap:5px}
+.chk{flex:1;aspect-ratio:1;max-width:40px;border:1px solid var(--line2);background:var(--surface);border-radius:8px;font-size:11px;color:var(--hint);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chk.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chk.today{border-color:var(--accent);border-width:2px}
+.fb{background:var(--accent-bg);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.fb-h{font-size:13px;font-weight:600;color:var(--accent-ink);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fb-head{font-size:13px;color:var(--accent-ink);margin-bottom:6px}
+.fb ul{margin:0;padding-left:18px}
+.fb li{font-size:12.5px;color:var(--accent-ink);margin-bottom:3px}
+.careblk{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;margin-bottom:9px}
+.careblk-h{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.careblk-h i{color:var(--accent)}
+.careblk ul{margin:0;padding-left:18px}
+.careblk li{font-size:13px;color:var(--muted);margin-bottom:5px}
+.foods{display:flex;gap:10px}
+.foods-col{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 12px}
+.foods-h{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.foods-col.good .foods-h{color:var(--accent-ink)} .foods-col.good .foods-h i{color:var(--accent)}
+.foods-col.avoid .foods-h{color:#993c1d} .foods-col.avoid .foods-h i{color:#D85A30}
+.foods-col span{display:block;font-size:12.5px;color:var(--muted);padding:3px 0}
+
 /* nav */
 #nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--surface);
   border-top:1px solid var(--line);padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:10}

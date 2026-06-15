@@ -1,6 +1,6 @@
 // localStorage ラッパー（プロフィール・記録・プラン）
 window.Store = (function () {
-  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read" };
+  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care" };
 
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -29,10 +29,28 @@ window.Store = (function () {
     isRead(id) { return this.getRead().includes(id); },
     markRead(id) { const r = this.getRead(); if (!r.includes(id)) { r.push(id); write(K.read, r); } },
 
-    exportAll() {
-      return JSON.stringify({ profile: this.getProfile(), plan: this.getPlan(), logs: this.getLogs(), read: this.getRead() }, null, 2);
+    getConditions() { return read(K.conditions, []); },
+    toggleCondition(id) {
+      const c = this.getConditions(); const i = c.indexOf(id);
+      if (i >= 0) c.splice(i, 1); else c.push(id);
+      write(K.conditions, c); return c;
     },
-    reset() { [K.profile, K.logs, K.plan, K.read].forEach(k => localStorage.removeItem(k)); }
+    // care: { [condId]: { [dateISO]: [habitId,...] } }
+    getCare(condId) { return read(K.care, {})[condId] || {}; },
+    toggleCareHabit(condId, date, habitId) {
+      const all = read(K.care, {});
+      const c = all[condId] || (all[condId] = {});
+      const day = c[date] || (c[date] = []);
+      const i = day.indexOf(habitId);
+      if (i >= 0) day.splice(i, 1); else day.push(habitId);
+      write(K.care, all);
+    },
+
+    exportAll() {
+      return JSON.stringify({ profile: this.getProfile(), plan: this.getPlan(), logs: this.getLogs(),
+        read: this.getRead(), conditions: this.getConditions(), care: read(K.care, {}) }, null, 2);
+    },
+    reset() { Object.values(K).forEach(k => localStorage.removeItem(k)); }
   };
 })();
 
