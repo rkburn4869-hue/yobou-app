@@ -23,6 +23,14 @@
     openArticle: id => { UI.nav("learn", handlers); UI.articleDetail(id, handlers); window.scrollTo(0, 0); },
     openGut: () => { UI.nav("gut", handlers); UI.gutGuide(handlers); window.scrollTo(0, 0); },
     openBeauty: () => { UI.nav("gut", handlers); UI.beautyGuide(handlers); window.scrollTo(0, 0); },
+    makeQuest: (item, type) => {
+      const icon = type === "strength" ? "ti-barbell" : type === "cardio" ? "ti-walk" : "ti-bath";
+      const w = window.YOBOU_WORKOUTS[item];
+      const q = { id: "wk-" + item, icon, title: item, detail: "プランの運動メニュー", why: (w && w.desc) || "今日のプランの運動。ホームでクリアできます。", custom: true };
+      const added = Store.addCustomQuest(window.YDate.today(), q);
+      window._toast = added ? "ホームのクエストに追加しました" : "すでに追加済みです";
+      go("home");
+    },
     toggleQuest: id => {
       const date = window.YDate.today();
       const wasDone = Store.getQuestDay(date).includes(id);
@@ -68,7 +76,7 @@
     UI.nav(route, handlers);
     const date = window.YDate.today();
     if (route === "home") UI.home(profile, plan, Store.getLog(date), handlers);
-    else if (route === "plan") UI.plan(profile, plan);
+    else if (route === "plan") UI.plan(profile, plan, handlers);
     else if (route === "meals") UI.meals(profile, handlers);
     else if (route === "learn") UI.learn(handlers);
     else if (route === "care") UI.care(handlers);

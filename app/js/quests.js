@@ -36,7 +36,7 @@ window.todayQuests = function (iso) {
   const day = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - epoch) / 86400000);
   const i1 = ((day % f.length) + f.length) % f.length;
   const i2 = (i1 + 1) % f.length;
-  return window.YOBOU_QUESTS.core.concat([f[i1], f[i2]]);
+  return window.YOBOU_QUESTS.core.concat([f[i1], f[i2]]).concat(window.Store.getCustomQuests(iso));
 };
 
 window.QUEST_GOAL = 5; // 1日にこれ以上クリアでその日を「達成」とみなす
@@ -61,4 +61,49 @@ window.questLevel = function () {
   Object.values(all).forEach(arr => { total += arr.length; });
   const per = 15;
   return { total, level: Math.floor(total / per) + 1, inLevel: total % per, per };
+};
+
+const _achieved = d => window.Store.getQuestDay(d).length >= Math.min(window.QUEST_GOAL, window.todayQuests(d).length);
+
+// その日のクエストを“全部”クリアした日数
+window.allClearDays = function () {
+  const all = window.Store.getAllQuests();
+  let n = 0;
+  Object.keys(all).forEach(d => { if (all[d].length > 0 && all[d].length >= window.todayQuests(d).length) n++; });
+  return n;
+};
+
+// 過去最高の連続達成日数
+window.bestStreak = function () {
+  const all = window.Store.getAllQuests();
+  const dates = Object.keys(all).sort();
+  if (!dates.length) return 0;
+  const start = new Date(dates[0] + "T00:00:00");
+  const end = new Date(window.YDate.today() + "T00:00:00");
+  let best = 0, cur = 0;
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    if (_achieved(window.YDate.iso(d))) { cur++; best = Math.max(best, cur); } else cur = 0;
+  }
+  return best;
+};
+
+// 週間チャレンジ（今週の達成日数 / 目標5日）
+window.weeklyChallenge = function () {
+  const target = 5;
+  const achieved = window.weekDates().filter(_achieved).length;
+  return { achieved, target, done: achieved >= target };
+};
+
+// バッジ（条件を満たすと獲得）
+window.questBadges = function () {
+  const L = window.questLevel(), best = window.bestStreak(), allc = window.allClearDays(), wk = window.weeklyChallenge();
+  return [
+    { id: "first", icon: "ti-seeding", label: "はじめの一歩", earned: L.total >= 1 },
+    { id: "allclear", icon: "ti-trophy", label: "パーフェクト達成", earned: allc >= 1 },
+    { id: "streak3", icon: "ti-flame", label: "3日連続", earned: best >= 3 },
+    { id: "streak7", icon: "ti-flame", label: "7日連続", earned: best >= 7 },
+    { id: "streak30", icon: "ti-flame", label: "30日連続", earned: best >= 30 },
+    { id: "week", icon: "ti-calendar-check", label: "週間チャレンジ", earned: wk.done },
+    { id: "lv5", icon: "ti-star", label: "Lv.5到達", earned: L.level >= 5 }
+  ];
 };

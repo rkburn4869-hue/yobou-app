@@ -62,7 +62,7 @@ window.Recommend = (function () {
   return { build, pick, DOMAINS };
 })();
 
-window.GOAL_LABELS = { fatloss: "減量", muscle: "筋肉・体力", energy: "活力・疲労回復", longevity: "長期の健康", beauty: "美容・アンチエイジング" };
+window.GOAL_LABELS = { fatloss: "減量", muscle: "筋肉・体力", energy: "活力・疲労回復", longevity: "長期の健康", beauty: "美容・アンチエイジング", malevitality: "男性機能アップ" };
 window.DOMAIN_META = {
   diet: { label: "食事", icon: "ti-salad" },
   exercise: { label: "運動", icon: "ti-run" },

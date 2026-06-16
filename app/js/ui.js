@@ -22,7 +22,7 @@ window.UI = (function () {
   // ---- オンボーディング ----
   function onboarding(state, handlers) {
     const sex = state.sex, goal = state.goal, age = state.age;
-    const goals = [["fatloss", "減量"], ["muscle", "筋肉・体力"], ["energy", "活力・疲労回復"], ["longevity", "長期の健康"], ["beauty", "美容・アンチエイジング"]];
+    const goals = [["fatloss", "減量"], ["muscle", "筋肉・体力"], ["energy", "活力・疲労回復"], ["longevity", "長期の健康"], ["beauty", "美容・アンチエイジング"], ["malevitality", "男性機能アップ"]];
     el("app").innerHTML = `
       <div class="onb">
         <div class="onb-card">
@@ -65,6 +65,7 @@ window.UI = (function () {
     const lv = window.questLevel();
     const allDone = ringN === quests.length;
     const just = window._justCleared; window._justCleared = null;
+    const toast = window._toast; window._toast = null;
     const art = window.todaysArticle();
     const artRead = window.Store.isRead(art.id);
     el("app").innerHTML = `
@@ -72,6 +73,7 @@ window.UI = (function () {
         <div><div class="muted sm">${window.YDate.label(date)}</div><h2>今日のクエスト</h2></div>
         <button class="iconbtn" id="goSettings" aria-label="設定"><i class="ti ti-settings"></i></button>
       </header>
+      ${toast ? `<div class="toast"><i class="ti ti-circle-check"></i> ${esc(toast)}</div>` : ""}
 
       <div class="quest-stats">
         <div class="qring" style="--p:${pct}"><div class="qring-in">${ringN}/${quests.length}</div></div>
@@ -82,6 +84,17 @@ window.UI = (function () {
         </div>
       </div>
       ${allDone ? `<div class="qclear"><i class="ti ti-trophy"></i> 今日のクエスト完了！おみごと</div>` : ""}
+
+      ${(() => {
+        const wk = window.weeklyChallenge();
+        const badges = window.questBadges().filter(b => b.earned);
+        return `<div class="challenge">
+          <div class="ch-head"><span><i class="ti ti-calendar-check"></i> 週間チャレンジ</span>
+            <span class="ch-prog">${wk.achieved}/${wk.target}日 ${wk.done ? '<i class="ti ti-trophy ch-tr"></i>' : ""}</span></div>
+          <div class="ch-bar"><div class="ch-fill" style="width:${Math.min(100, Math.round(wk.achieved / wk.target * 100))}%"></div></div>
+          <div class="badges">${badges.length ? badges.map(b => `<span class="badge"><i class="ti ${b.icon}"></i>${b.label}</span>`).join("") : '<span class="badge-empty">クエストをクリアしてバッジを集めよう</span>'}</div>
+        </div>`;
+      })()}
 
       <button class="learn-card" id="goLearn">
         <div class="learn-tag"><i class="ti ti-bulb"></i> 今日の学び · ${art.min}分 ${artRead ? '<span class="readbadge"><i class="ti ti-check"></i>読了</span>' : ""}</div>
@@ -125,11 +138,12 @@ window.UI = (function () {
   }
 
   // ---- 週間プラン ----
-  function plan(profile, plan) {
+  function plan(profile, plan, handlers) {
     const tip = profile.goal === "muscle" ? "タンパク質を毎食しっかり＋漸進的に負荷を上げる。"
       : profile.goal === "fatloss" ? "野菜・タンパク質を先に。夜の炭水化物は控えめ。"
       : profile.goal === "energy" ? "鉄分と睡眠を最優先。速歩でミトコンドリア活性。"
       : profile.goal === "beauty" ? "日焼け止め＋抗酸化食材＋しっかり睡眠。糖化を防ぎ血流を上げる。"
+      : profile.goal === "malevitality" ? "血流(NO)を上げる食材＋骨盤底筋トレ＋睡眠。内臓脂肪と飲み過ぎを減らす。"
       : "地中海食＋食物繊維。速歩・筋トレ・柔軟をバランスよく。";
     el("app").innerHTML = `
       <header class="top"><div><h2>週間プラン</h2><div class="muted sm">${window.GOAL_LABELS[profile.goal]}向け</div></div></header>
@@ -148,6 +162,7 @@ window.UI = (function () {
                 <ul class="wlist">${w.items.map(it => `<li><span class="wname">${esc(it.name)}</span><span class="wsets">${esc(it.sets)}</span></li>`).join("")}</ul>
                 ${w.points && w.points.length ? `<div class="wpoints"><i class="ti ti-bulb"></i> ${w.points.map(esc).join(" ・ ")}</div>` : ""}`
                 : `<p class="wdesc">この日はゆっくり休んで回復にあてましょう。</p>`}
+              <button class="mkquest" data-mkquest="${esc(s.item)}" data-mktype="${s.type}"><i class="ti ti-plus"></i> これを今日のクエストにする</button>
             </div>
           </div>`;
         }).join("")}
@@ -163,6 +178,10 @@ window.UI = (function () {
       const opening = body.hasAttribute("hidden");
       body.toggleAttribute("hidden", !opening);
       day.classList.toggle("open", opening);
+    });
+    el("app").querySelectorAll("[data-mkquest]").forEach(b => b.onclick = e => {
+      e.stopPropagation();
+      handlers.makeQuest(b.dataset.mkquest, b.dataset.mktype);
     });
   }
 

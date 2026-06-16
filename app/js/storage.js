@@ -1,6 +1,6 @@
 // localStorage ラッパー（プロフィール・記録・プラン）
 window.Store = (function () {
-  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care", quests: "yobou.quests" };
+  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care", quests: "yobou.quests", custom: "yobou.custom" };
 
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -38,6 +38,14 @@ window.Store = (function () {
       const i = day.indexOf(id);
       if (i >= 0) day.splice(i, 1); else day.push(id);
       write(K.quests, all);
+    },
+    // custom: { [dateISO]: [questObj,...] } プランから追加したクエスト
+    getCustomQuests(date) { return read(K.custom, {})[date] || []; },
+    addCustomQuest(date, q) {
+      const all = read(K.custom, {});
+      const arr = all[date] || (all[date] = []);
+      if (!arr.some(x => x.id === q.id)) { arr.push(q); write(K.custom, all); return true; }
+      return false;
     },
 
     getConditions() { return read(K.conditions, []); },

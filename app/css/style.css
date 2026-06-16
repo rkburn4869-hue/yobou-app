@@ -55,6 +55,19 @@ p{margin:0}
 .today-item .d{font-size:12px;color:var(--muted)}
 .today-item.done .t{color:var(--muted)}
 
+/* weekly challenge & badges */
+.challenge{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px}
+.ch-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:500;margin-bottom:8px}
+.ch-head i{color:var(--accent)}
+.ch-prog{color:var(--accent-ink);font-weight:600}
+.ch-tr{color:#BA7517}
+.ch-bar{height:7px;background:var(--line);border-radius:7px;overflow:hidden;margin-bottom:10px}
+.ch-fill{height:100%;background:var(--accent);border-radius:7px;transition:width .3s}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--accent-ink);background:var(--accent-bg);padding:4px 9px;border-radius:20px}
+.badge i{font-size:13px}
+.badge-empty{font-size:12px;color:var(--hint)}
+
 /* quest accordion */
 .quest{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:9px;overflow:hidden}
 .quest.done{border-color:var(--accent);background:var(--accent-bg)}
@@ -117,6 +130,12 @@ input[type=number],textarea{width:100%;padding:11px;border:1px solid var(--line2
 .wsets{flex:none;color:var(--accent-ink);font-weight:500}
 .wpoints{margin-top:9px;font-size:12px;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px 10px}
 .wpoints i{color:var(--accent)}
+.mkquest{display:inline-flex;align-items:center;gap:6px;margin-top:11px;background:var(--accent-bg);color:var(--accent-ink);
+  border:1px solid var(--accent);border-radius:20px;font-size:13px;font-weight:500;padding:8px 15px;cursor:pointer}
+.toast{display:flex;align-items:center;gap:7px;background:var(--accent);color:#fff;font-size:13px;font-weight:500;
+  padding:10px 14px;border-radius:10px;margin:10px 0;animation:tin .3s ease}
+.toast i{font-size:16px}
+@keyframes tin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .type-cardio{background:var(--info-bg);color:var(--info);border-color:transparent}
 .type-strength{background:var(--accent-bg);color:var(--accent-ink);border-color:transparent}
 .type-rest{color:var(--muted)}
