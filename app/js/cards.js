@@ -134,5 +134,31 @@ window.YOBOU_CARDS = [
     applies:{sex:["female"], ageBand:["20s","30s","40s"], goal:["energy","longevity","fatloss"]}, priority:3, evidence:2, source:"Cochrane 2023" },
   { id:"supp-men-zinc", domain:"supplement", title:"男性: 亜鉛",
     body:"テストステロン・免疫に関与し不足しがち。牡蠣・赤身肉が基本。摂りすぎ注意(銅とのバランス)。iHerbで適量を。",
-    applies:{sex:["male"], ageBand:["30s","40s","50s","60s"], goal:["muscle","energy","longevity"]}, priority:3, evidence:2, source:"spartan_testosterone" }
+    applies:{sex:["male"], ageBand:["30s","40s","50s","60s"], goal:["muscle","energy","longevity"]}, priority:3, evidence:2, source:"spartan_testosterone" },
+
+  // ===== 美容・アンチエイジング beauty =====
+  { id:"diet-beauty-collagen", domain:"diet", title:"コラーゲンを支える食べ方",
+    body:"肌のハリの材料はタンパク質＋ビタミンC。毎食タンパク質(魚・卵・大豆・鶏)に、柑橘・ピーマン・ブロッコリーなどビタミンCを合わせる。食べる順は野菜から＝糖化(肌の老化)も防ぐ。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty"]}, priority:5, evidence:2, source:"美容ガイド" },
+  { id:"diet-beauty-antiox", domain:"diet", title:"抗酸化で肌をサビさせない",
+    body:"色の濃い野菜・ベリー・トマト(リコピン)・緑茶・カカオなどの抗酸化食材で、紫外線やストレスの活性酸素から肌を守る。毎食“色”を一品。甘い飲料・揚げ物は控えめに。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty","longevity"]}, priority:4, evidence:2, source:"美容ガイド" },
+  { id:"ex-beauty-flow", domain:"exercise", title:"血流で肌を生まれ変わらせる",
+    body:"速歩やゾーン2の有酸素で血流が上がり、肌に酸素と栄養が届く。週150分目安。汗をかくと巡りUP。やり過ぎは酸化ストレスなので適度に。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty","longevity","energy"]}, priority:4, evidence:2, source:"美容ガイド" },
+  { id:"sleep-beauty", domain:"sleep", title:"美肌は睡眠で作られる",
+    body:"深い眠りの間に成長ホルモンが肌を修復。6〜8時間・就寝前の食事と酒を控える。寝不足はくま・くすみ・老化を進める。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty","energy","longevity"]}, priority:5, evidence:3, source:"美容ガイド / growth_hormone" },
+  { id:"rest-beauty-uv", domain:"rest", title:"毎日のUVケア(最優先)",
+    body:"日焼け止め(SPF30+)を毎日。曇りや室内の窓際でも。毎日塗る人は塗らない人より肌老化が約24%少なかった(RCT)。帽子・日陰も併用。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty"]}, priority:5, evidence:3, source:"Hughes 2013 (PubMed 23732711)" },
+  { id:"med-beauty-stress", domain:"meditation", title:"ストレスケアで肌を守る",
+    body:"慢性ストレス(コルチゾール過剰)は肌のバリア低下・炎症・老化を進める。5分の呼吸法やマインドフルネスで“肌の敵”を減らす。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty","energy","longevity"]}, priority:3, evidence:2, source:"美容ガイド" },
+  { id:"supp-beauty-collagen", domain:"supplement", title:"コラーゲンペプチド",
+    body:"1日2.5〜10gを90日続けると肌の弾力・うるおい・シワが改善(19RCTメタ解析)。食事のタンパク質＋ビタミンCが土台。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty"]}, priority:3, evidence:3, source:"de Miranda 2021 (PubMed 33742704)" },
+  { id:"supp-beauty-vitc", domain:"supplement", title:"ビタミンC(美容)",
+    body:"コラーゲン合成に必須＋抗酸化。野菜・果物から十分摂れるが、不足分はサプリで補助。摂りすぎはお腹がゆるくなることも。",
+    applies:{sex:["male","female"], ageBand:"all", goal:["beauty"]}, priority:2, evidence:2, source:"美容ガイド" }
 ];

@@ -22,7 +22,7 @@ window.UI = (function () {
   // ---- オンボーディング ----
   function onboarding(state, handlers) {
     const sex = state.sex, goal = state.goal, age = state.age;
-    const goals = [["fatloss", "減量"], ["muscle", "筋肉・体力"], ["energy", "活力・疲労回復"], ["longevity", "長期の健康"]];
+    const goals = [["fatloss", "減量"], ["muscle", "筋肉・体力"], ["energy", "活力・疲労回復"], ["longevity", "長期の健康"], ["beauty", "美容・アンチエイジング"]];
     el("app").innerHTML = `
       <div class="onb">
         <div class="onb-card">
@@ -111,6 +111,7 @@ window.UI = (function () {
     const tip = profile.goal === "muscle" ? "タンパク質を毎食しっかり＋漸進的に負荷を上げる。"
       : profile.goal === "fatloss" ? "野菜・タンパク質を先に。夜の炭水化物は控えめ。"
       : profile.goal === "energy" ? "鉄分と睡眠を最優先。速歩でミトコンドリア活性。"
+      : profile.goal === "beauty" ? "日焼け止め＋抗酸化食材＋しっかり睡眠。糖化を防ぎ血流を上げる。"
       : "地中海食＋食物繊維。速歩・筋トレ・柔軟をバランスよく。";
     el("app").innerHTML = `
       <header class="top"><div><h2>週間プラン</h2><div class="muted sm">${window.GOAL_LABELS[profile.goal]}向け</div></div></header>
