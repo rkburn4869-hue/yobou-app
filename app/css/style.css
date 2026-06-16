@@ -22,6 +22,28 @@ p{margin:0}
 .ring{width:46px;height:46px;border-radius:50%;border:3px solid var(--accent);
   display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:var(--accent-ink);flex:none}
 
+/* quest stats */
+.quest-stats{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:6px 0 12px}
+.qring{width:64px;height:64px;border-radius:50%;flex:none;
+  background:conic-gradient(var(--accent) calc(var(--p)*1%), var(--line) 0);
+  display:flex;align-items:center;justify-content:center}
+.qring-in{width:50px;height:50px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
+.qmeta{flex:1}
+.qrow{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.qbadge.lv{background:var(--accent);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:20px}
+.qstreak{font-size:13px;color:var(--ink);display:flex;align-items:center;gap:3px}
+.qstreak i{color:#D85A30}
+.qxp{height:6px;background:var(--line);border-radius:6px;overflow:hidden}
+.qxp-bar{height:100%;background:var(--accent);border-radius:6px}
+.qxp-lbl{font-size:11px;color:var(--hint);margin-top:4px}
+.qclear{background:var(--accent-bg);color:var(--accent-ink);border-radius:10px;padding:10px 13px;font-size:13px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.qclear i{color:#BA7517}
+.qico{font-size:15px;margin-right:5px;color:var(--accent);vertical-align:-2px}
+.gut-card.beauty{background:#fbeaf0;border-color:#D4537E}
+@media (prefers-color-scheme:dark){.gut-card.beauty{background:#3a1626;border-color:#D4537E}}
+.gut-card.beauty .gut-card-l{background:#D4537E}
+.gut-card.beauty .gut-card-t,.gut-card.beauty .gut-card-s,.gut-card.beauty>i{color:#D4537E}
+
 /* today list */
 .today-list{display:flex;flex-direction:column;gap:9px;margin:6px 0 16px}
 .today-item{display:flex;gap:11px;align-items:flex-start;text-align:left;width:100%;

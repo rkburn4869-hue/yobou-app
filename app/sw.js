@@ -1,5 +1,5 @@
 // 予防アプリ サービスワーカー（オフライン対応）
-const CACHE = "yobou-v3";
+const CACHE = "yobou-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,8 @@ const ASSETS = [
   "./js/articles.js",
   "./js/conditions.js",
   "./js/gut.js",
+  "./js/beauty.js",
+  "./js/quests.js",
   "./js/storage.js",
   "./js/recommend.js",
   "./js/ui.js",

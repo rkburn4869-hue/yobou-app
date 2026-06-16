@@ -22,6 +22,12 @@
     nav: go,
     openArticle: id => { UI.nav("learn", handlers); UI.articleDetail(id, handlers); window.scrollTo(0, 0); },
     openGut: () => { UI.nav("gut", handlers); UI.gutGuide(handlers); window.scrollTo(0, 0); },
+    openBeauty: () => { UI.nav("gut", handlers); UI.beautyGuide(handlers); window.scrollTo(0, 0); },
+    toggleQuest: id => {
+      const date = window.YDate.today();
+      Store.toggleQuest(date, id);
+      go("home");
+    },
     openCondition: id => { UI.nav("condition", handlers); UI.conditionDetail(id, handlers); window.scrollTo(0, 0); },
     toggleCondition: id => { Store.toggleCondition(id); go("care"); },
     toggleCare: (condId, date, habitId) => {

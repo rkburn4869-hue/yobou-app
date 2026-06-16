@@ -1,6 +1,6 @@
 // localStorage ラッパー（プロフィール・記録・プラン）
 window.Store = (function () {
-  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care" };
+  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care", quests: "yobou.quests" };
 
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -29,6 +29,17 @@ window.Store = (function () {
     isRead(id) { return this.getRead().includes(id); },
     markRead(id) { const r = this.getRead(); if (!r.includes(id)) { r.push(id); write(K.read, r); } },
 
+    // quests: { [dateISO]: [questId,...] }
+    getAllQuests() { return read(K.quests, {}); },
+    getQuestDay(date) { return this.getAllQuests()[date] || []; },
+    toggleQuest(date, id) {
+      const all = this.getAllQuests();
+      const day = all[date] || (all[date] = []);
+      const i = day.indexOf(id);
+      if (i >= 0) day.splice(i, 1); else day.push(id);
+      write(K.quests, all);
+    },
+
     getConditions() { return read(K.conditions, []); },
     toggleCondition(id) {
       const c = this.getConditions(); const i = c.indexOf(id);
@@ -48,7 +59,7 @@ window.Store = (function () {
 
     exportAll() {
       return JSON.stringify({ profile: this.getProfile(), plan: this.getPlan(), logs: this.getLogs(),
-        read: this.getRead(), conditions: this.getConditions(), care: read(K.care, {}) }, null, 2);
+        read: this.getRead(), conditions: this.getConditions(), care: read(K.care, {}), quests: this.getAllQuests() }, null, 2);
     },
     reset() { Object.values(K).forEach(k => localStorage.removeItem(k)); }
   };

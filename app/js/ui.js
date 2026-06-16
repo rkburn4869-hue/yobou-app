@@ -54,23 +54,33 @@ window.UI = (function () {
 
   function bandLabel(b) { return { "20s": "20代", "30s": "30代", "40s": "40代", "50s": "50代", "60s": "60代以上" }[b]; }
 
-  // ---- ホーム ----
+  // ---- ホーム（今日のクエスト） ----
   function home(profile, plan, log, handlers) {
     const date = window.YDate.today();
-    const tcards = plan.today;
-    const doneSet = new Set((log && log.done) || []);
-    const ringN = tcards.filter(c => doneSet.has(c.domain)).length;
+    const quests = window.todayQuests(date);
+    const doneSet = new Set(window.Store.getQuestDay(date));
+    const ringN = quests.filter(q => doneSet.has(q.id)).length;
+    const pct = Math.round((ringN / quests.length) * 100);
+    const streak = window.questStreak();
+    const lv = window.questLevel();
+    const allDone = ringN === quests.length;
     const art = window.todaysArticle();
     const artRead = window.Store.isRead(art.id);
     el("app").innerHTML = `
       <header class="top">
-        <div><div class="muted sm">${window.YDate.label(date)}</div><h2>今日のプラン</h2></div>
-        <div class="head-right">
-          <div class="ring">${ringN}/${tcards.length}</div>
-          <button class="iconbtn" id="goSettings" aria-label="設定"><i class="ti ti-settings"></i></button>
-        </div>
+        <div><div class="muted sm">${window.YDate.label(date)}</div><h2>今日のクエスト</h2></div>
+        <button class="iconbtn" id="goSettings" aria-label="設定"><i class="ti ti-settings"></i></button>
       </header>
-      <div class="sub">${{male:"男性",female:"女性"}[profile.sex]} · ${bandLabel(profile.ageBand)} · ${window.GOAL_LABELS[profile.goal]}</div>
+
+      <div class="quest-stats">
+        <div class="qring" style="--p:${pct}"><div class="qring-in">${ringN}/${quests.length}</div></div>
+        <div class="qmeta">
+          <div class="qrow"><span class="qbadge lv">Lv.${lv.level}</span><span class="qstreak"><i class="ti ti-flame"></i> ${streak}日連続</span></div>
+          <div class="qxp"><div class="qxp-bar" style="width:${Math.round((lv.inLevel / lv.per) * 100)}%"></div></div>
+          <div class="qxp-lbl">次のレベルまで ${lv.per - lv.inLevel}クエスト</div>
+        </div>
+      </div>
+      ${allDone ? `<div class="qclear"><i class="ti ti-trophy"></i> 今日のクエスト完了！おみごと</div>` : ""}
 
       <button class="learn-card" id="goLearn">
         <div class="learn-tag"><i class="ti ti-bulb"></i> 今日の学び · ${art.min}分 ${artRead ? '<span class="readbadge"><i class="ti ti-check"></i>読了</span>' : ""}</div>
@@ -79,18 +89,18 @@ window.UI = (function () {
       </button>
 
       <div class="today-list">
-        ${tcards.map(c => `
-          <button class="today-item ${doneSet.has(c.domain) ? "done" : ""}" data-domain="${c.domain}">
-            <i class="ti ${doneSet.has(c.domain) ? "ti-circle-check" : "ti-circle"}"></i>
+        ${quests.map(q => `
+          <button class="today-item quest ${doneSet.has(q.id) ? "done" : ""}" data-quest="${q.id}">
+            <i class="ti ${doneSet.has(q.id) ? "ti-circle-check" : "ti-circle"}"></i>
             <span class="ti-area">
-              <span class="t">${window.DOMAIN_META[c.domain].label} · ${esc(c.title)}</span>
-              <span class="d">${esc(c.body).slice(0, 38)}…</span>
+              <span class="t"><i class="ti ${q.icon} qico"></i>${esc(q.title)}</span>
+              <span class="d">${esc(q.detail)}</span>
             </span>
           </button>`).join("")}
       </div>
       <button class="ghost" id="goLog"><i class="ti ti-pencil"></i> 今日の記録をつける</button>
     `;
-    el("app").querySelectorAll("[data-domain]").forEach(b => b.onclick = () => handlers.toggle(b.dataset.domain));
+    el("app").querySelectorAll("[data-quest]").forEach(b => b.onclick = () => handlers.toggleQuest(b.dataset.quest));
     el("goLog").onclick = () => handlers.nav("log");
     el("goSettings").onclick = () => handlers.nav("settings");
     el("goLearn").onclick = () => handlers.openArticle(art.id);
@@ -162,6 +172,11 @@ window.UI = (function () {
         <div class="gut-card-r"><div class="gut-card-t">腸を育てる完全ガイド</div><div class="gut-card-s">腸内細菌の重要性と、最高の環境に育てる方法</div></div>
         <i class="ti ti-chevron-right"></i>
       </button>
+      <button class="gut-card beauty" id="beautyGuide">
+        <div class="gut-card-l"><i class="ti ti-sparkles"></i></div>
+        <div class="gut-card-r"><div class="gut-card-t">美容・アンチエイジング</div><div class="gut-card-s">紫外線・糖化・睡眠…若さを保つ実践ガイド</div></div>
+        <i class="ti ti-chevron-right"></i>
+      </button>
       <button class="learn-card today" id="todayArt">
         <div class="learn-tag"><i class="ti ti-star"></i> 今日の1本 · ${today.min}分</div>
         <div class="learn-title">${esc(today.title)}</div>
@@ -178,6 +193,7 @@ window.UI = (function () {
     `;
     el("todayArt").onclick = () => handlers.openArticle(today.id);
     el("gutGuide").onclick = () => handlers.openGut();
+    el("beautyGuide").onclick = () => handlers.openBeauty();
     el("app").querySelectorAll("[data-art]").forEach(b => b.onclick = () => handlers.openArticle(b.dataset.art));
   }
 
@@ -207,6 +223,36 @@ window.UI = (function () {
           </article>`).join("")}
       </div>
       <p class="muted sm note">※ 持病・服薬・妊娠中・免疫低下のある人は、サプリ開始前に主治医に相談してください。</p>
+    `;
+    el("back").onclick = () => handlers.nav("learn");
+  }
+
+  // ---- 美容・アンチエイジングガイド ----
+  function beautyGuide(handlers) {
+    const g = window.YOBOU_BEAUTY;
+    el("app").innerHTML = `
+      <button class="back" id="back"><i class="ti ti-arrow-left"></i> 学び</button>
+      <header class="top"><div><h2>美容・アンチエイジング</h2><div class="muted sm">若さは習慣8割</div></div></header>
+      <p class="cond-ov">${esc(g.intro)}</p>
+      ${g.sections.map(s => `
+        <div class="careblk">
+          <div class="careblk-h"><i class="ti ${s.icon}"></i> ${esc(s.title)}</div>
+          <ul>${s.points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+        </div>`).join("")}
+
+      <h3 class="sec">サプリ・スキンケア（一次情報つき）</h3>
+      <div class="supp-note"><i class="ti ti-flask"></i> 最優先は“日焼け止め・睡眠・食事・運動”。下記は一次情報(RCT/メタ解析)で確認。刺激や持病がある人は皮膚科/主治医に相談を。</div>
+      <div class="cards">
+        ${g.supplements.map(s => `
+          <article class="card">
+            <div class="card-head"><span class="chip"><i class="ti ti-sparkles"></i>${esc(s.name)}</span><span class="ev">${stars(s.evidence)}</span></div>
+            <p class="supp-dose"><i class="ti ti-prescription"></i> ${esc(s.dose)}</p>
+            <p>${esc(s.effect)}</p>
+            <p class="supp-caution"><i class="ti ti-alert-triangle"></i> ${esc(s.caution)}</p>
+            <div class="src">出典: ${esc(s.source)}</div>
+          </article>`).join("")}
+      </div>
+      <p class="muted sm note">※ 化粧品・サプリは個人差があります。刺激・持病・服薬・妊娠中は専門家に相談を。</p>
     `;
     el("back").onclick = () => handlers.nav("learn");
   }
@@ -420,5 +466,5 @@ window.UI = (function () {
   }
   function hideNav() { el("nav").style.display = "none"; }
 
-  return { onboarding, home, plan, meals, learn, gutGuide, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
+  return { onboarding, home, plan, meals, learn, gutGuide, beautyGuide, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
 })();
