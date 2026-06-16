@@ -96,6 +96,15 @@ window.UI = (function () {
         </div>`;
       })()}
 
+      ${Object.keys(window.YOBOU_PROGRAMS).filter(id => window.Store.isProgramStarted(id) && window.programCurrentDay(id) <= 30).map(id => {
+        const p = window.YOBOU_PROGRAMS[id], cur = window.programCurrentDay(id), dn = window.programDoneDays(id);
+        return `<button class="prog-home" data-phome="${id}" style="--pa:${p.accent}">
+          <i class="ti ${p.icon}"></i>
+          <span class="ph-body"><span class="ph-name">${esc(p.name)}</span><span class="ph-day">Day ${cur} / 30</span></span>
+          <span class="ph-bar"><span class="ph-fill" style="width:${Math.round(dn / 30 * 100)}%"></span></span>
+        </button>`;
+      }).join("")}
+
       <button class="learn-card" id="goLearn">
         <div class="learn-tag"><i class="ti ti-bulb"></i> 今日の学び · ${art.min}分 ${artRead ? '<span class="readbadge"><i class="ti ti-check"></i>読了</span>' : ""}</div>
         <div class="learn-title">${esc(art.title)}</div>
@@ -135,6 +144,7 @@ window.UI = (function () {
     el("goLog").onclick = () => handlers.nav("log");
     el("goSettings").onclick = () => handlers.nav("settings");
     el("goLearn").onclick = () => handlers.openArticle(art.id);
+    el("app").querySelectorAll("[data-phome]").forEach(b => b.onclick = () => handlers.openProgram(b.dataset.phome));
   }
 
   // ---- 週間プラン ----
@@ -234,6 +244,11 @@ window.UI = (function () {
         <div class="gut-card-r"><div class="gut-card-t">美容・アンチエイジング</div><div class="gut-card-s">紫外線・糖化・睡眠…若さを保つ実践ガイド</div></div>
         <i class="ti ti-chevron-right"></i>
       </button>
+      <button class="gut-card challenge30" id="programList">
+        <div class="gut-card-l"><i class="ti ti-flag"></i></div>
+        <div class="gut-card-r"><div class="gut-card-t">30日チャレンジ</div><div class="gut-card-s">腸活・男性機能・アンチエイジングを毎日クリアで習慣化</div></div>
+        <i class="ti ti-chevron-right"></i>
+      </button>
       <button class="learn-card today" id="todayArt">
         <div class="learn-tag"><i class="ti ti-star"></i> 今日の1本 · ${today.min}分</div>
         <div class="learn-title">${esc(today.title)}</div>
@@ -251,6 +266,7 @@ window.UI = (function () {
     el("todayArt").onclick = () => handlers.openArticle(today.id);
     el("gutGuide").onclick = () => handlers.openGut();
     el("beautyGuide").onclick = () => handlers.openBeauty();
+    el("programList").onclick = () => handlers.nav("program");
     el("app").querySelectorAll("[data-art]").forEach(b => b.onclick = () => handlers.openArticle(b.dataset.art));
   }
 
@@ -282,6 +298,69 @@ window.UI = (function () {
       <p class="muted sm note">※ 持病・服薬・妊娠中・免疫低下のある人は、サプリ開始前に主治医に相談してください。</p>
     `;
     el("back").onclick = () => handlers.nav("learn");
+  }
+
+  // ---- 30日チャレンジ：一覧 ----
+  function programList(handlers) {
+    const progs = window.YOBOU_PROGRAMS;
+    el("app").innerHTML = `
+      <button class="back" id="back"><i class="ti ti-arrow-left"></i> 学び</button>
+      <header class="top"><div><h2>30日チャレンジ</h2><div class="muted sm">毎日のメニューをクリアして進む</div></div></header>
+      <div class="cards">
+        ${Object.keys(progs).map(id => {
+          const p = progs[id], started = window.Store.isProgramStarted(id), done = window.programDoneDays(id), cur = window.programCurrentDay(id);
+          const label = !started ? "はじめる" : (cur > 30 ? "完了！" : `Day ${cur} / 30`);
+          return `<button class="prog-card" data-prog="${id}" style="--pa:${p.accent}">
+            <div class="prog-ic"><i class="ti ${p.icon}"></i></div>
+            <div class="prog-body">
+              <div class="prog-name">${esc(p.name)}</div>
+              <div class="prog-intro">${esc(p.intro)}</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(done / 30 * 100)}%"></div></div>
+            </div>
+            <div class="prog-cta">${label}<i class="ti ti-chevron-right"></i></div>
+          </button>`;
+        }).join("")}
+      </div>
+      <p class="muted sm note">自分のペースでOK。その日のメニューを全部クリアすると次の日に進みます。</p>
+    `;
+    el("back").onclick = () => handlers.nav("learn");
+    el("app").querySelectorAll("[data-prog]").forEach(b => b.onclick = () => handlers.openProgram(b.dataset.prog));
+  }
+
+  // ---- 30日チャレンジ：その日のメニュー ----
+  function programDay(id, handlers) {
+    const p = window.YOBOU_PROGRAMS[id];
+    const cur = window.programCurrentDay(id);
+    const done = window.programDoneDays(id);
+    const finished = cur > 30;
+    const day = finished ? 30 : cur;
+    const tasks = window.programTasks(id, day);
+    const doneSet = new Set(window.Store.getProgramState(id).days[day] || []);
+    const d = p.days[day - 1];
+    const allDone = tasks.every((_, i) => doneSet.has(i));
+    el("app").innerHTML = `
+      <button class="back" id="back"><i class="ti ti-arrow-left"></i> 30日チャレンジ</button>
+      <header class="top"><div><h2>${esc(p.name)}</h2><div class="muted sm">${finished ? "全30日 完了" : "Day " + day + " / 30"} · 達成 ${done}日</div></div></header>
+      <div class="prog-bar big"><div class="prog-fill" style="width:${Math.round(done / 30 * 100)}%;background:${p.accent}"></div></div>
+      <div class="prog-dots">${Array.from({ length: 30 }, (_, i) => {
+        const n = i + 1, st = n < cur ? "done" : (n === cur ? "cur" : "lock");
+        return `<span class="pdot ${st}" style="--pa:${p.accent}">${st === "done" ? '<i class="ti ti-check"></i>' : n}</span>`;
+      }).join("")}</div>
+
+      ${finished ? `<div class="qclear"><i class="ti ti-trophy"></i> 30日チャレンジ達成！おめでとう 🎉</div>`
+        : `<div class="prog-focus" style="--pa:${p.accent}"><div class="pf-h">Day ${day}・今日のフォーカス</div>
+            <div class="pf-t">${esc(d.f)}</div><div class="pf-l">${esc(d.l)}</div></div>
+          ${allDone ? `<div class="qclear"><i class="ti ti-circle-check"></i> Day ${day} 完了！次の日へ進めます</div>` : ""}
+          <div class="today-list">
+            ${tasks.map((t, i) => `
+              <button class="today-item quest ${doneSet.has(i) ? "done" : ""}" data-ptask="${i}">
+                <i class="ti ${doneSet.has(i) ? "ti-circle-check" : "ti-circle"}"></i>
+                <span class="ti-area"><span class="t">${i === 0 ? '<i class="ti ti-star qico"></i>' : ""}${esc(t)}</span></span>
+              </button>`).join("")}
+          </div>`}
+    `;
+    el("back").onclick = () => handlers.nav("program");
+    el("app").querySelectorAll("[data-ptask]").forEach(b => b.onclick = () => handlers.toggleProgramTask(id, day, +b.dataset.ptask));
   }
 
   // ---- 美容・アンチエイジングガイド ----
@@ -516,6 +595,7 @@ window.UI = (function () {
     if (["history", "settings"].includes(active)) active = active === "history" ? "log" : "home";
     if (active === "condition") active = "care";
     if (active === "gut") active = "learn";
+    if (active === "program") active = "learn";
     el("nav").innerHTML = items.map(([k, t, ic]) =>
       `<button class="${active === k ? "on" : ""}" data-nav="${k}"><i class="ti ${ic}"></i><span>${t}</span></button>`).join("");
     el("nav").querySelectorAll("[data-nav]").forEach(b => b.onclick = () => handlers.nav(b.dataset.nav));
@@ -523,5 +603,5 @@ window.UI = (function () {
   }
   function hideNav() { el("nav").style.display = "none"; }
 
-  return { onboarding, home, plan, meals, learn, gutGuide, beautyGuide, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
+  return { onboarding, home, plan, meals, learn, gutGuide, beautyGuide, programList, programDay, articleDetail, care, conditionDetail, logForm, history, settings, nav, hideNav };
 })();

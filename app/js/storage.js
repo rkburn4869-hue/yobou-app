@@ -1,6 +1,6 @@
 // localStorage ラッパー（プロフィール・記録・プラン）
 window.Store = (function () {
-  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care", quests: "yobou.quests", custom: "yobou.custom" };
+  const K = { profile: "yobou.profile", logs: "yobou.logs", plan: "yobou.plan", read: "yobou.read", conditions: "yobou.conditions", care: "yobou.care", quests: "yobou.quests", custom: "yobou.custom", programs: "yobou.programs" };
 
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -48,6 +48,23 @@ window.Store = (function () {
       return false;
     },
 
+    // programs: { [id]: { started: iso, days: { [dayNum]: [taskIdx,...] } } }
+    getAllPrograms() { return read(K.programs, {}); },
+    getProgramState(id) { return this.getAllPrograms()[id] || { started: null, days: {} }; },
+    isProgramStarted(id) { return !!this.getAllPrograms()[id]; },
+    startProgram(id) {
+      const all = this.getAllPrograms();
+      if (!all[id]) { all[id] = { started: window.YDate.today(), days: {} }; write(K.programs, all); }
+    },
+    toggleProgramTask(id, day, idx) {
+      const all = this.getAllPrograms();
+      const st = all[id] || (all[id] = { started: window.YDate.today(), days: {} });
+      const d = st.days[day] || (st.days[day] = []);
+      const i = d.indexOf(idx);
+      if (i >= 0) d.splice(i, 1); else d.push(idx);
+      write(K.programs, all);
+    },
+
     getConditions() { return read(K.conditions, []); },
     toggleCondition(id) {
       const c = this.getConditions(); const i = c.indexOf(id);
@@ -67,7 +84,7 @@ window.Store = (function () {
 
     exportAll() {
       return JSON.stringify({ profile: this.getProfile(), plan: this.getPlan(), logs: this.getLogs(),
-        read: this.getRead(), conditions: this.getConditions(), care: read(K.care, {}), quests: this.getAllQuests() }, null, 2);
+        read: this.getRead(), conditions: this.getConditions(), care: read(K.care, {}), quests: this.getAllQuests(), programs: this.getAllPrograms() }, null, 2);
     },
     reset() { Object.values(K).forEach(k => localStorage.removeItem(k)); }
   };

@@ -23,6 +23,11 @@
     openArticle: id => { UI.nav("learn", handlers); UI.articleDetail(id, handlers); window.scrollTo(0, 0); },
     openGut: () => { UI.nav("gut", handlers); UI.gutGuide(handlers); window.scrollTo(0, 0); },
     openBeauty: () => { UI.nav("gut", handlers); UI.beautyGuide(handlers); window.scrollTo(0, 0); },
+    openProgram: id => { Store.startProgram(id); UI.nav("program", handlers); UI.programDay(id, handlers); window.scrollTo(0, 0); },
+    toggleProgramTask: (id, day, idx) => {
+      Store.toggleProgramTask(id, day, idx);
+      UI.nav("program", handlers); UI.programDay(id, handlers);
+    },
     makeQuest: (item, type) => {
       const icon = type === "strength" ? "ti-barbell" : type === "cardio" ? "ti-walk" : "ti-bath";
       const w = window.YOBOU_WORKOUTS[item];
@@ -79,6 +84,7 @@
     else if (route === "plan") UI.plan(profile, plan, handlers);
     else if (route === "meals") UI.meals(profile, handlers);
     else if (route === "learn") UI.learn(handlers);
+    else if (route === "program") UI.programList(handlers);
     else if (route === "care") UI.care(handlers);
     else if (route === "log") UI.logForm(date, Store.getLog(date), handlers);
     else if (route === "history") UI.history(Store.getLogs());
