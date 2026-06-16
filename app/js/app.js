@@ -25,7 +25,9 @@
     openBeauty: () => { UI.nav("gut", handlers); UI.beautyGuide(handlers); window.scrollTo(0, 0); },
     toggleQuest: id => {
       const date = window.YDate.today();
+      const wasDone = Store.getQuestDay(date).includes(id);
       Store.toggleQuest(date, id);
+      window._justCleared = wasDone ? null : id;
       go("home");
     },
     openCondition: id => { UI.nav("condition", handlers); UI.conditionDetail(id, handlers); window.scrollTo(0, 0); },

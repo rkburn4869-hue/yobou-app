@@ -64,6 +64,7 @@ window.UI = (function () {
     const streak = window.questStreak();
     const lv = window.questLevel();
     const allDone = ringN === quests.length;
+    const just = window._justCleared; window._justCleared = null;
     const art = window.todaysArticle();
     const artRead = window.Store.isRead(art.id);
     el("app").innerHTML = `
@@ -89,18 +90,35 @@ window.UI = (function () {
       </button>
 
       <div class="today-list">
-        ${quests.map(q => `
-          <button class="today-item quest ${doneSet.has(q.id) ? "done" : ""}" data-quest="${q.id}">
-            <i class="ti ${doneSet.has(q.id) ? "ti-circle-check" : "ti-circle"}"></i>
-            <span class="ti-area">
-              <span class="t"><i class="ti ${q.icon} qico"></i>${esc(q.title)}</span>
-              <span class="d">${esc(q.detail)}</span>
-            </span>
-          </button>`).join("")}
+        ${quests.map(q => {
+          const done = doneSet.has(q.id);
+          return `<div class="quest ${done ? "done" : ""} ${q.id === just ? "just" : ""}" id="q-${q.id}">
+            <button class="quest-head" data-expand="${q.id}">
+              <i class="ti ${done ? "ti-circle-check" : "ti-circle"} qcheck"></i>
+              <span class="ti-area">
+                <span class="t"><i class="ti ${q.icon} qico"></i>${esc(q.title)}</span>
+                <span class="d">${esc(q.detail)}</span>
+              </span>
+              <i class="ti ti-chevron-down qchev"></i>
+            </button>
+            <div class="quest-body" id="qb-${q.id}" hidden>
+              <p class="quest-why">${esc(q.why)}</p>
+              <button class="quest-clear ${done ? "undo" : ""}" data-clear="${q.id}">
+                ${done ? '<i class="ti ti-rotate-2"></i> クリアを取り消す' : '<i class="ti ti-check"></i> クリアする'}
+              </button>
+            </div>
+          </div>`;
+        }).join("")}
       </div>
       <button class="ghost" id="goLog"><i class="ti ti-pencil"></i> 今日の記録をつける</button>
     `;
-    el("app").querySelectorAll("[data-quest]").forEach(b => b.onclick = () => handlers.toggleQuest(b.dataset.quest));
+    el("app").querySelectorAll("[data-expand]").forEach(b => b.onclick = () => {
+      const id = b.dataset.expand, body = el("qb-" + id), item = el("q-" + id);
+      const opening = body.hasAttribute("hidden");
+      body.toggleAttribute("hidden", !opening);
+      item.classList.toggle("open", opening);
+    });
+    el("app").querySelectorAll("[data-clear]").forEach(b => b.onclick = () => handlers.toggleQuest(b.dataset.clear));
     el("goLog").onclick = () => handlers.nav("log");
     el("goSettings").onclick = () => handlers.nav("settings");
     el("goLearn").onclick = () => handlers.openArticle(art.id);
@@ -115,11 +133,24 @@ window.UI = (function () {
       : "地中海食＋食物繊維。速歩・筋トレ・柔軟をバランスよく。";
     el("app").innerHTML = `
       <header class="top"><div><h2>週間プラン</h2><div class="muted sm">${window.GOAL_LABELS[profile.goal]}向け</div></div></header>
+      <div class="muted sm wk-hint"><i class="ti ti-hand-finger"></i> 曜日をタップすると種目・回数・セットが見られます</div>
       <div class="week">
-        ${plan.schedule.map(s => `<div class="wrow">
-          <span class="wd">${s.d}</span>
-          <span class="witem type-${s.type}">${esc(s.item)}</span>
-        </div>`).join("")}
+        ${plan.schedule.map((s, i) => {
+          const w = window.YOBOU_WORKOUTS[s.item];
+          return `<div class="wday">
+            <button class="wrow" data-wexp="${i}">
+              <span class="wd">${s.d}</span>
+              <span class="witem type-${s.type}">${esc(s.item)}</span>
+              <i class="ti ti-chevron-down wchev"></i>
+            </button>
+            <div class="wdetail" id="wd-${i}" hidden>
+              ${w ? `<p class="wdesc">${esc(w.desc)}</p>
+                <ul class="wlist">${w.items.map(it => `<li><span class="wname">${esc(it.name)}</span><span class="wsets">${esc(it.sets)}</span></li>`).join("")}</ul>
+                ${w.points && w.points.length ? `<div class="wpoints"><i class="ti ti-bulb"></i> ${w.points.map(esc).join(" ・ ")}</div>` : ""}`
+                : `<p class="wdesc">この日はゆっくり休んで回復にあてましょう。</p>`}
+            </div>
+          </div>`;
+        }).join("")}
       </div>
       <div class="tip"><i class="ti ti-bulb"></i> ${tip}</div>
       <h3 class="sec">領域別のおすすめ</h3>
@@ -127,6 +158,12 @@ window.UI = (function () {
         ${window.Recommend.DOMAINS.map(d => (plan.picked[d][0] ? cardHTML(plan.picked[d][0], { source: true }) : "")).join("")}
       </div>
     `;
+    el("app").querySelectorAll("[data-wexp]").forEach(b => b.onclick = () => {
+      const i = b.dataset.wexp, body = el("wd-" + i), day = b.parentElement;
+      const opening = body.hasAttribute("hidden");
+      body.toggleAttribute("hidden", !opening);
+      day.classList.toggle("open", opening);
+    });
   }
 
   // ---- 献立 ----
